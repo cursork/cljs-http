@@ -1,7 +1,8 @@
 (ns cljs-http.core
   (:import [goog.net EventType XhrIo])
   (:require [cljs-http.util :as util]
-            [cljs.core.async :as async]))
+            [cljs.core.async :as async]
+            [goog.events :as events]))
 
 (def pending-requests (atom {}))
 
@@ -30,7 +31,7 @@
                   (.setTimeoutInterval timeout)
                   (.setWithCredentials send-credentials))]
     (swap! pending-requests assoc channel xhr)
-    (.listen xhr EventType.COMPLETE
+    (events/listen xhr EventType.COMPLETE
      #(let [target (.-target %1)]
         (->> {:status (.getStatus target)
               :body (.getResponseText target)
